@@ -90,10 +90,6 @@
 #include "terminate.h"
 #include "addresspool.h"
 
-#ifdef USE_XFRM_INTERFACE
-# include "kernel_xfrm_interface.h"
-#endif
-
 struct connection *find_v1_client_connection(struct connection *c,
 					     const ip_selector *local_client,
 					     const ip_selector *remote_client);
@@ -1567,13 +1563,6 @@ static stf_status quick_inI1_outR1_continue12_tail(struct state *st, struct msg_
 	 * We do this before any state updating so that
 	 * failure won't look like success.
 	 */
-#ifdef USE_XFRM_INTERFACE
-	struct connection *c = st->st_connection;
-	if (c->xfrmi != NULL && c->xfrmi->if_id != 0)
-		if (!add_xfrm_interface(c, st->logger))
-			return STF_FATAL;
-#endif
-
 	struct child_sa *child = pexpect_child_sa(st);
 
 	terminate_conflicts(child);
@@ -1743,12 +1732,6 @@ stf_status quick_inR1_outI2_tail(struct state *st, struct msg_digest *md)
 	 * We do this before any state updating so that
 	 * failure won't look like success.
 	 */
-#ifdef USE_XFRM_INTERFACE
-	if (c->xfrmi != NULL && c->xfrmi->if_id != 0)
-		if (!add_xfrm_interface(c, st->logger))
-			return STF_FATAL;
-#endif
-
 	/*
 	 * IKE must still exist as how else could the quick message
 	 * have been decrypted?
@@ -1786,12 +1769,6 @@ stf_status quick_inI2(struct state *st, struct msg_digest *md UNUSED)
 	 * We do this before any state updating so that
 	 * failure won't look like success.
 	 */
-#ifdef USE_XFRM_INTERFACE
-	struct connection *c = st->st_connection;
-	if (c->xfrmi != NULL && c->xfrmi->if_id != 0)
-		if (!add_xfrm_interface(c, st->logger))
-			return STF_FATAL;
-#endif
 	/*
 	 * IKE must still exist as how else could the quick message
 	 * have been decrypted?
